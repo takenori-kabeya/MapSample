@@ -15,7 +15,6 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     var regionMeters: CLLocationDistance = 1000.0
     var updateOnce: Bool = true
     
-    //@Published var regionInfo: RegionInfo = RegionInfo()
     @Published var region: MKCoordinateRegion = MKCoordinateRegion()
     
     override init() {
@@ -31,7 +30,6 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         locations.last.map {
             let center = CLLocationCoordinate2D(latitude: $0.coordinate.latitude, longitude: $0.coordinate.longitude)
-            //regionInfo.region = MKCoordinateRegion(center: center, latitudinalMeters: regionMeters, longitudinalMeters: regionMeters)
             self.region = MKCoordinateRegion(center: center, latitudinalMeters: regionMeters, longitudinalMeters: regionMeters)
         }
         if updateOnce {
