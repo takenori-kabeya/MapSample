@@ -37,7 +37,6 @@ struct MapWithPinMode: View {
                     .offset(x: -12)
                 }
             })
-            //.modifier(isPinDraggingMode ? Gesture : EmptyModifier())
             .gesture(drag(geometry))
         }
     }
