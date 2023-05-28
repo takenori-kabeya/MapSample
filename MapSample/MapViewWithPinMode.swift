@@ -16,11 +16,12 @@ struct MapWithPinMode: View {
     @Binding var pinDropped: Bool
     var pinName: String
     @Binding var isPinDraggingMode: Bool
+    @State var region: MKCoordinateRegion = MKCoordinateRegion()
     
     var body: some View {
         GeometryReader { geometry in
             let items: [PinLocationInfo] = pinDropped ? [PinLocationInfo(location: pinCoordinate, name: pinName)] : []
-            Map(coordinateRegion: $locationManager.region,
+            Map(coordinateRegion: $region,
                 interactionModes: isPinDraggingMode ? [] : . all,
                 showsUserLocation: true,
                 userTrackingMode: nil,
@@ -37,6 +38,7 @@ struct MapWithPinMode: View {
                     .offset(x: -12)
                 }
             })
+            .sync($locationManager.region, with: $region)
             .gesture(drag(geometry))
         }
     }

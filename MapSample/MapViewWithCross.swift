@@ -26,12 +26,13 @@ struct MapWithCross: View {
     
     @Binding var pinCoordinate: CLLocationCoordinate2D
     @Binding var pinDropped: Bool
+    @State var region: MKCoordinateRegion = MKCoordinateRegion()
     var pinName: String
     
     var body: some View {
         ZStack {
             let items: [PinLocationInfo] = pinDropped ? [PinLocationInfo(location: pinCoordinate, name: pinName)] : []
-            Map(coordinateRegion: $locationManager.region,
+            Map(coordinateRegion: $region,
                 interactionModes: .all,
                 showsUserLocation: true,
                 userTrackingMode: nil,
@@ -55,6 +56,7 @@ struct MapWithCross: View {
                 .stroke(lineWidth: 1)
                 .frame(height: 1)
         }
+        .sync($locationManager.region, with: $region)
     }
 }
 struct MapViewWithCross: View {

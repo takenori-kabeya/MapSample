@@ -7,6 +7,8 @@
 
 import Foundation
 import MapKit
+import SwiftUI
+
 
 
 class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
@@ -28,12 +30,14 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        locations.last.map {
-            let center = CLLocationCoordinate2D(latitude: $0.coordinate.latitude, longitude: $0.coordinate.longitude)
-            self.region = MKCoordinateRegion(center: center, latitudinalMeters: regionMeters, longitudinalMeters: regionMeters)
-        }
-        if updateOnce {
-            self.stopUpdatingLocation()
+        DispatchQueue.main.async {
+            locations.last.map {
+                let center = CLLocationCoordinate2D(latitude: $0.coordinate.latitude, longitude: $0.coordinate.longitude)
+                self.region = MKCoordinateRegion(center: center, latitudinalMeters: self.regionMeters, longitudinalMeters: self.regionMeters)
+            }
+            if self.updateOnce {
+                self.stopUpdatingLocation()
+            }
         }
     }
     
@@ -45,3 +49,31 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         manager.stopUpdatingLocation()
     }
 }
+
+
+
+extension MKCoordinateRegion: Equatable {
+    public static func == (lhs: MKCoordinateRegion, rhs: MKCoordinateRegion) -> Bool {
+        return (lhs.center.latitude == rhs.center.latitude &&
+                lhs.center.longitude == rhs.center.longitude &&
+                lhs.span.latitudeDelta == rhs.span.latitudeDelta &&
+                lhs.span.longitudeDelta == rhs.span.longitudeDelta)
+    }
+}
+
+extension View {
+    func sync<T: Equatable>(_ published: Binding<T>, with binding: Binding<T>) -> some View {
+        self
+            .onChange(of: published.wrappedValue) { published in
+                if binding.wrappedValue != published {
+                    binding.wrappedValue = published
+                }
+            }
+            .onChange(of: binding.wrappedValue) { binding in
+                if published.wrappedValue != binding {
+                    published.wrappedValue = binding
+                }
+            }
+    }
+}
+
